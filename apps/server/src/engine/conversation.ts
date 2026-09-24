@@ -13,6 +13,7 @@ import {
 import { computerInstructions, computerTools } from "../computer-tools.ts";
 import type { Config } from "../config.ts";
 import type { AgentService } from "./service.ts";
+import { createOpenAI } from "@ai-sdk/openai";
 
 export class ConversationAgent extends AbstractAgent {
   constructor(
@@ -213,8 +214,23 @@ export class ConversationAgent extends AbstractAgent {
         },
       }),
     ];
+
+    const configuredModel = this.config.model ?? "openai/unconfigured";
+    const modelId = configuredModel.replace(/^openai[/:]/, "");
+
+    const model =
+      process.env.OPENAI_USE_CHAT_COMPLETIONS === "true" &&
+      configuredModel.startsWith("openai")
+        ? createOpenAI({
+            apiKey: process.env.OPENAI_API_KEY ?? "ollama",
+            baseURL:
+              process.env.OPENAI_BASE_URL ??
+              "http://127.0.0.1:11434/v1",
+          }).chat(modelId)
+        : configuredModel;
+
     const agent = new BuiltInAgent({
-      model: this.config.model ?? "openai/unconfigured",
+      model,
       maxSteps: 6,
       maxRetries: 0,
       tools,
