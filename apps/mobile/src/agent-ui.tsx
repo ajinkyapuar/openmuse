@@ -3,9 +3,9 @@ import {
   Bell,
   CalendarDays,
   ChevronRight,
-  CircleDollarSign,
   FileText,
   Globe2,
+  GraduationCap,
   Heart,
   Lightbulb,
   ListChecks,
@@ -16,7 +16,6 @@ import {
   RefreshCw,
   Square,
   Target,
-  Users,
   X,
 } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -36,6 +35,7 @@ import type {
 import { useAgentWorkspace } from "./agent-workspace";
 import { ActivityScreen, ConnectionsScreen } from "./screens";
 import {
+  agentDisplayName,
   Button,
   Card,
   CheckRow,
@@ -192,7 +192,7 @@ export function AgentActivityScreen() {
     <View style={{ gap: 20 }}>
       <AgentStatus />
       <View style={[s.row, { gap: 8 }]}>
-        {["All", "In progress", "Finished"].map((item) => (
+        {["All", "In progress", "Completed"].map((item) => (
           <Button key={item} small primary={filter === item} onPress={() => setFilter(item)}>
             {item}
           </Button>
@@ -204,11 +204,11 @@ export function AgentActivityScreen() {
       {!tasks.length && (
         <Empty
           icon={ListChecks}
-          title="A place for the work"
-          detail="Delegate a task in Chat. Its plan, progress and results stay here."
+          title="Your learning workspace"
+          detail="Study plans, tutoring tasks, and completed activities stay organized here."
         />
       )}
-      <SectionHeading title="Reviews & receipts" />
+      <SectionHeading title="Reviews & check-ins" />
       <ActivityScreen />
     </View>
   );
@@ -902,7 +902,7 @@ export function DelegateSheet() {
   return (
     <Sheet
       title="Hand over an outcome"
-      subtitle="OpenMuse saves a plan and keeps working on the server."
+      subtitle="Mira saves a plan and keeps working on the server."
       onClose={close}
     >
       <View style={[s.row, { flexWrap: "wrap", gap: 8, marginBottom: 20 }]}>
@@ -940,7 +940,7 @@ export function DelegateSheet() {
             ))}
           {!workspace.mail.some((mail) => mail.attachments.length) && (
             <Text style={s.muted}>
-              Connect mail in Apps and select a message with a PDF attachment.
+              Connect mail in Connections and select a message with a PDF attachment.
             </Text>
           )}
         </View>
@@ -1014,9 +1014,9 @@ export function IdeasScreen() {
     <View style={{ gap: 20 }}>
       <AgentStatus />
       <View style={s.between}>
-        <Text style={s.small}>Inspired by your connected apps</Text>
+        <Text style={s.small}>Helpful suggestions from your connected apps</Text>
         <Button small icon={RefreshCw} busy={busy} onPress={() => void refreshIdeas()}>
-          Find ideas
+          Refresh suggestions
         </Button>
       </View>
       <ErrorNotice error={error} />
@@ -1027,7 +1027,7 @@ export function IdeasScreen() {
         <Empty
           icon={Lightbulb}
           title="Room for a good idea"
-          detail="Find ideas from the sources you have granted access to. Each suggestion includes its evidence."
+          detail="New suggestions come from the sources you have granted access to. Each suggestion includes its evidence."
         />
       )}
       {(data?.ideas || [])
@@ -1089,13 +1089,15 @@ function IdeaCard({ idea }: { idea: Idea }) {
         <Text style={{ fontSize: 27, width: 34, paddingTop: 3 }}>
           {/document|permission|form/i.test(idea.title)
             ? "📋"
-            : /money|spend|saving/i.test(idea.title)
-              ? "💸"
-              : /goal|plan|training/i.test(idea.title)
-                ? "👟"
-                : /dinner|table/i.test(idea.title)
-                  ? "🍽️"
-                  : "💡"}
+            : /quiz|exam|study|homework|lesson|assignment|reading/i.test(idea.title)
+              ? "📚"
+              : /money|spend|saving/i.test(idea.title)
+                ? "💸"
+                : /goal|plan|training/i.test(idea.title)
+                  ? "👟"
+                  : /dinner|table/i.test(idea.title)
+                    ? "🍽️"
+                    : "💡"}
         </Text>
         <View style={{ flex: 1, gap: 5 }}>
           <Text style={[s.heading, { fontSize: 16, lineHeight: 23 }]}>{idea.title}</Text>
@@ -1106,12 +1108,7 @@ function IdeaCard({ idea }: { idea: Idea }) {
         <View style={{ gap: 15, marginTop: 18, paddingLeft: 48 }}>
           <EvidenceList items={idea.evidence} />
           {editing && (
-            <Field
-              label="What should OpenMuse do?"
-              value={prompt}
-              onChangeText={setPrompt}
-              multiline
-            />
+            <Field label="What should Mira do?" value={prompt} onChangeText={setPrompt} multiline />
           )}
           <ErrorNotice error={error} />
           <View style={[s.row, { gap: 8, flexWrap: "wrap" }]}>
@@ -1188,7 +1185,7 @@ export function GoalsScreen() {
         ))}
         {!monitors.length && (
           <Text style={[s.muted, { paddingVertical: 10 }]}>
-            Ticket prices, a reservation, a page you’re watching.
+            School pages, learning resources, and other websites Mira can keep an eye on.
           </Text>
         )}
         {monitors.length > 3 && (
@@ -1210,7 +1207,7 @@ export function GoalsScreen() {
               backgroundColor: "#3D9BDE",
             }}
           />
-          <Text style={[s.heading, { color: colors.blueDark }]}>Goals</Text>
+          <Text style={[s.heading, { color: colors.blueDark }]}>Learning goals</Text>
         </View>
         {data?.goals.map((item) => (
           <Pressable
@@ -1236,16 +1233,16 @@ export function GoalsScreen() {
         ))}
         {!data?.goals.length && (
           <Text style={[s.muted, { paddingVertical: 10 }]}>
-            Big plans start with one small step.
+            Build progress one small step at a time.
           </Text>
         )}
       </View>
       <View style={{ height: 1, backgroundColor: colors.line }} />
       <Text style={s.heading}>Create a goal</Text>
       {[
-        { name: "Health", icon: Heart },
-        { name: "Relationships", icon: Users },
-        { name: "Finances", icon: CircleDollarSign },
+        { name: "Learning", icon: GraduationCap },
+        { name: "Study habits", icon: ListChecks },
+        { name: "Wellbeing", icon: Heart },
         { name: "Something else", icon: Target },
       ].map((item) => (
         <Pressable
@@ -1514,7 +1511,7 @@ function MonitorForm({ onDone }: { onDone: () => void }) {
       <Text style={[s.small, { marginBottom: 14 }]}>
         {sample
           ? "Changes to this built-in page stay in your workspace."
-          : "OpenMuse checks this public page on the server and saves meaningful changes in Notifications."}
+          : "Mira checks this public page on the server and saves meaningful changes in Notifications."}
       </Text>
       <ErrorNotice error={error} />
       <Button
@@ -1666,7 +1663,7 @@ export function AppsScreen() {
   const { data, mutate } = useAgentWorkspace();
   const [query, setQuery] = useState("");
   const [settings, setSettings] = useState(false);
-  const [name, setName] = useState(data?.identity.name || "OpenMuse");
+  const [name, setName] = useState(agentDisplayName(data?.identity.name));
   const [tone, setTone] = useState(data?.identity.tone || "warm");
   const [avatar, setAvatar] = useState(data?.identity.avatar || "sky");
   const [showChatUpdates, setShowChatUpdates] = useState(data?.identity.showChatUpdates !== false);
@@ -1675,7 +1672,7 @@ export function AppsScreen() {
   const [busy, setBusy] = useState(false);
   useEffect(() => {
     if (data?.identity) {
-      setName(data.identity.name);
+      setName(agentDisplayName(data.identity.name));
       setTone(data.identity.tone);
       setAvatar(data.identity.avatar || "sky");
       setShowChatUpdates(data.identity.showChatUpdates !== false);
@@ -1702,19 +1699,19 @@ export function AppsScreen() {
     {
       section: "mail" as const,
       title: "Mail",
-      detail: "Read messages and prepare replies",
+      detail: "Messages, important updates and replies",
       icon: Mail,
     },
     {
       section: "calendar" as const,
       title: "Calendar",
-      detail: "Events and reviewed invitations",
+      detail: "Classes, deadlines and study sessions",
       icon: CalendarDays,
     },
     {
       section: "browser" as const,
-      title: "Agent computer",
-      detail: "Persistent browser sessions",
+      title: "Mira computer",
+      detail: "Browser and computer tasks for supported workflows",
       icon: Globe2,
     },
     {
@@ -1728,13 +1725,13 @@ export function AppsScreen() {
     <View style={{ gap: 22 }}>
       <AgentStatus />
       <Field
-        label="Search apps"
+        label="Search integrations"
         value={query}
         onChangeText={setQuery}
-        placeholder="Search connectors"
+        placeholder="Search integrations"
       />
       <ConnectionsScreen query={query} />
-      <Text style={s.heading}>On your computer</Text>
+      <Text style={s.heading}>Device tools</Text>
       <Card style={{ paddingVertical: 3, backgroundColor: "#F4F5F6" }}>
         {shortcuts
           .filter((item) =>

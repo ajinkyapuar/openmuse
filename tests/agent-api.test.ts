@@ -75,7 +75,7 @@ test("agent API requires a session and reports the actual worker state", async (
   );
   const workspace = await read<AgentWorkspace>("");
   assert.equal(workspace.worker.running, false);
-  assert.equal(workspace.identity.name, "OpenMuse");
+  assert.equal(workspace.identity.name, "Mira");
   assert.equal(workspace.identity.tone, "warm");
 });
 
@@ -230,8 +230,10 @@ test("idea dismissal survives refresh and concurrent acceptance creates one goal
   const ideas = await read<Idea[]>("/ideas/refresh", {});
   assert.ok(ideas.length >= 2);
   assert.ok(ideas.every((idea) => idea.evidence.length > 0));
-  const dismissed = ideas[0],
-    accepted = ideas[1];
+  const fresh = ideas.filter((idea) => idea.status === "new");
+  assert.ok(fresh.length >= 2);
+  const dismissed = fresh[0],
+    accepted = fresh[1];
   assert.equal(
     (await read<Idea>(`/ideas/${dismissed.id}`, { action: "dismiss" })).status,
     "dismissed",

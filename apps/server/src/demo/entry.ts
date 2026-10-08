@@ -90,9 +90,7 @@ const api = spawn(
     },
   },
 );
-console.log(
-  "OpenMuse recording demo: AI Mock scripts the model; browser visits use the real worker.",
-);
+console.log("Mira demo: AI Mock for investor demo; browser visits use the real worker.");
 console.log(`Demo API: ${publicUrl}; browser worker: ${workerUrl}`);
 console.log(`Isolated demo data: ${dataDir}`);
 console.log(`Start the app with EXPO_PUBLIC_API_URL=${publicUrl} pnpm dev:web`);

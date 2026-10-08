@@ -25,7 +25,7 @@ export function ComputerEntry() {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Agent computer — take control"
+      accessibilityLabel="Mira computer — take control"
       onPress={() => open({ type: "computer" })}
       style={[
         s.row,
@@ -154,7 +154,7 @@ export function ComputerSheet() {
   }
   return (
     <Sheet
-      title="Agent computer"
+      title="Mira computer"
       subtitle="Your agent works here. Step in whenever you need."
       onClose={close}
     >

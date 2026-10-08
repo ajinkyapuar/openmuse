@@ -1,4 +1,5 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
+import type { Idea } from "../../../packages/domain/src/agent.ts";
 import type {
   ActionProposal,
   ActivityEntry,
@@ -11,7 +12,6 @@ import type {
 } from "../../../packages/domain/src/index.ts";
 import { GoogleClient } from "../../../packages/integrations/src/google.ts";
 import { createSamplePdf } from "../../../packages/integrations/src/pdf.ts";
-import type { ActionService } from "./actions.ts";
 import { agentConfigured } from "./agent.ts";
 import type { Config } from "./config.ts";
 import type { Store } from "./db.ts";
@@ -132,15 +132,15 @@ export class WorkspaceService {
       )
       .sort((a, b) => b.date.localeCompare(a.date));
   }
-  async ensureSample(owner: string, actions: ActionService) {
+  async ensureSample(owner: string) {
     if (this.config.mode !== "sample") return;
     const active = this.seeding.get(owner);
     if (active) return active;
-    const task = this.seed(owner, actions).finally(() => this.seeding.delete(owner));
+    const task = this.seed(owner).finally(() => this.seeding.delete(owner));
     this.seeding.set(owner, task);
     await task;
   }
-  private async seed(owner: string, actions: ActionService) {
+  private async seed(owner: string) {
     if (await this.db.get(owner, "settings", "seeded")) return;
     const file = await this.files.import(
       owner,
@@ -151,6 +151,12 @@ export class WorkspaceService {
     const now = new Date();
     const at = (h: number, m = 0) => {
       const d = new Date(now);
+      d.setHours(h, m, 0, 0);
+      return d.toISOString();
+    };
+    const tomorrow = (h: number, m = 0) => {
+      const d = new Date(now);
+      d.setDate(now.getDate() + 1);
       d.setHours(h, m, 0, 0);
       return d.toISOString();
     };
@@ -171,11 +177,11 @@ export class WorkspaceService {
       {
         id: "mail-design",
         threadId: "design-thread",
-        sender: "Jamie Chen",
-        from: "jamie@example.com",
+        sender: "Sam Torres",
+        from: "sam@example.com",
         to: ["alex@example.com"],
-        subject: "Coffee and a catch-up?",
-        body: "Hey Alex,\n\nWould love to catch up this week. I’m free Thursday afternoon. How does 3 PM at Bluebird Coffee sound?\n\nJamie\n\nThis invitation is part of your local workspace.",
+        subject: "Soccer practice this week?",
+        body: "Hi Alex,\n\nThe team is practicing Thursday at 5 PM in the park. Let me know if your child can make it and I’ll save a spot.\n\nThanks!\nSam\n\nThis message is included with your local workspace.",
         date: at(8, 15),
         unread: true,
         label: "Personal",
@@ -188,7 +194,7 @@ export class WorkspaceService {
         from: "stay@seabird.example",
         to: ["alex@example.com"],
         subject: "Your weekend, all sorted",
-        body: "Your reservation is confirmed.\n\nCheck-in: Friday, 3 PM\nCheck-out: Sunday, 11 AM\n\nThis fictional reservation demonstrates how OpenMuse can organize travel details.",
+        body: "Your reservation is confirmed.\n\nCheck-in: Friday, 3 PM\nCheck-out: Sunday, 11 AM\n\nThis fictional reservation demonstrates how Mira can organize travel details.",
         date: at(7, 30),
         unread: false,
         label: "Travel",
@@ -241,20 +247,141 @@ export class WorkspaceService {
         end: at(14),
         location: "Little Saint",
       },
+      {
+        ...base,
+        id: "event-math-quiz",
+        title: "Math quiz",
+        description: "Math quiz · Period 2",
+        start: tomorrow(8, 45),
+        end: tomorrow(9, 15),
+        location: "Lincoln Middle School",
+      },
     ])
       await this.db.put(owner, "events", event);
-    await actions.propose(owner, {
+    // The one pending review seeded for the sample workspace stays
+    // parent/learning-facing. It is written directly (instead of through
+    // actions.propose, which prefixes a verb like "Create") so the review
+    // card reads exactly "Review tonight's math study plan". Approving it
+    // still flows through the normal action pipeline and creates the
+    // matching calendar event.
+    const reviewActionId = randomUUID();
+    await this.db.put(owner, "actions", {
+      id: reviewActionId,
+      title: "Review tonight's math study plan",
       kind: "calendar.create",
       data: {
         ...base,
-        title: "Coffee with Jamie",
-        start: at(15),
-        end: at(16),
-        location: "Bluebird Coffee",
-        description: "Catch up over coffee",
-        attendees: ["jamie@example.com"],
+        title: "Tonight's math study plan",
+        start: at(19),
+        end: at(19, 30),
+        location: "Home",
+        description: "A quiet block to go over tonight's study plan with Mira",
       },
-    });
+      connectionId: "sample-google",
+      account: "alex@example.com",
+      status: "awaiting_review",
+      hash: createHash("sha256").update(reviewActionId).digest("hex"),
+      createdAt: now.toISOString(),
+      expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+    } satisfies ActionProposal);
+    await this.db.put(owner, "activity", {
+      id: randomUUID(),
+      actionId: reviewActionId,
+      title: "Review tonight's math study plan",
+      detail: "Study plan ready for review",
+      date: now.toISOString(),
+      status: "awaiting_review",
+    } satisfies ActivityEntry);
+    const formMail = mails.find((mail) => mail.id === "mail-fieldtrip");
+    const meetingMail = mails.find((mail) => mail.id === "mail-design");
+    if (formMail && meetingMail) {
+      const sampleIdea = (
+        text: string,
+        source: Mail,
+        title: string,
+        reason: string,
+        prompt: string,
+        kind: "agent" | "document",
+        status: "new" | "dismissed",
+      ): Idea => ({
+        id: createHash("sha256").update(text).digest("hex"),
+        title,
+        reason,
+        evidence: [
+          {
+            id: source.id,
+            kind: "mail",
+            title: source.subject,
+            excerpt: source.body.slice(0, 400),
+          },
+        ],
+        prompt,
+        kind,
+        input: { messageId: source.id },
+        status,
+        createdAt: now.toISOString(),
+      });
+      // The two ideas the engine would derive from this sample mailbox stay out of
+      // the way so the sample workspace presents its two learning suggestions.
+      // Their ids match the deterministic ids the ideas engine generates.
+      await this.db.put(
+        owner,
+        "ideas",
+        sampleIdea(
+          `document:${formMail.id}:${formMail.body}`,
+          formMail,
+          `I can help with ${formMail.subject}`,
+          `${formMail.sender} sent a document that may need your attention. I can prepare it and a reply for your review.`,
+          `Help complete the PDF from “${formMail.subject}” and prepare a reply for review.`,
+          "document",
+          "dismissed",
+        ),
+      );
+      await this.db.put(
+        owner,
+        "ideas",
+        sampleIdea(
+          `coordination:${meetingMail.id}`,
+          meetingMail,
+          `I can help coordinate ${meetingMail.subject}`,
+          `${meetingMail.sender} mentioned getting together. I can check your calendar and prepare a response for review.`,
+          `Review the email “${meetingMail.subject}”, check my calendar, and propose a next step.`,
+          "agent",
+          "dismissed",
+        ),
+      );
+      const quizIdea = sampleIdea(
+        "mira:math-quiz-review",
+        formMail,
+        "I can help you prepare for tomorrow’s math quiz",
+        "Your calendar shows a math quiz tomorrow. I can create a focused review plan for you.",
+        "Help me prepare for tomorrow’s math quiz. Ask me which topics are covered, then build a focused review plan with a short schedule and a first practice question.",
+        "agent",
+        "new",
+      );
+      quizIdea.evidence = [
+        {
+          id: "event-math-quiz",
+          kind: "user",
+          title: "Calendar · Math quiz",
+          excerpt: "Math quiz · tomorrow, 8:45 AM (Lincoln Middle School)",
+        },
+      ];
+      await this.db.put(owner, "ideas", quizIdea);
+      await this.db.put(
+        owner,
+        "ideas",
+        sampleIdea(
+          "mira:evening-study-plan",
+          formMail,
+          "I can help organize your study time this evening",
+          "You have several learning tasks coming up. I can make a study plan with focused sessions and healthy breaks.",
+          "Help me organize study time this evening. Ask me which assignments are due, then turn them into a study plan with focused sessions and sensible breaks.",
+          "agent",
+          "new",
+        ),
+      );
+    }
     await this.db.put(owner, "settings", { id: "google", enabled: true });
     await this.db.put(owner, "settings", { id: "seeded", value: true });
   }

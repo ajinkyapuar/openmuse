@@ -24,7 +24,7 @@ before(async () => {
     googleRedirectUri: "http://localhost:8787/api/google/callback",
     allowedOrigins: [],
   });
-  await server.workspace.ensureSample(owner, server.actions);
+  await server.workspace.ensureSample(owner);
 });
 after(async () => {
   await server.agent.stop();
@@ -100,7 +100,7 @@ test("document job runs without a client, waits for review, and resumes from its
 
 test("ideas ignore sent replies while retaining unfinished incoming requests", async () => {
   const ideaOwner = "sent-reply-ideas";
-  await server.workspace.ensureSample(ideaOwner, server.actions);
+  await server.workspace.ensureSample(ideaOwner);
   const workspace = await server.workspace.snapshot(ideaOwner);
   const incoming = workspace.mail.find((mail) => mail.attachments.length);
   assert.ok(incoming);

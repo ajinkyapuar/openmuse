@@ -39,28 +39,39 @@ import { ComputerDraftProvider } from "./src/computer-drafts";
 import { Details } from "./src/details";
 import { BrowserScreen, CalendarScreen, FilesScreen, MailScreen } from "./src/screens";
 import { ThreadsProvider, ThreadsSheet, useMuseThread } from "./src/threads";
-import { Button, Card, colors, ErrorNotice, Field, IconButton, Mascot, s } from "./src/ui";
+import {
+  APP_TAGLINE,
+  agentDisplayName,
+  Button,
+  Card,
+  colors,
+  ErrorNotice,
+  Field,
+  IconButton,
+  Mascot,
+  s,
+} from "./src/ui";
 import { type Detail, useWorkspace, WorkspaceContext } from "./src/workspace";
 
 const nav: { id: Section; label: string; icon: LucideIcon }[] = [
   { id: "chat", label: "Chat", icon: MessageCircle },
   { id: "activity", label: "Activity", icon: PanelsTopLeft },
-  { id: "ideas", label: "Ideas", icon: Lightbulb },
+  { id: "ideas", label: "For you", icon: Lightbulb },
   { id: "goals", label: "Goals", icon: SquareCheck },
-  { id: "apps", label: "Apps", icon: Shapes },
+  { id: "apps", label: "Connections", icon: Shapes },
 ];
 const titles: Partial<Record<Section, { title: string; subtitle: string }>> = {
-  activity: { title: "Activity", subtitle: "Plans, progress, decisions and results." },
-  ideas: { title: "Ideas", subtitle: "Useful next steps, grounded in your world." },
+  activity: { title: "Learning Activity", subtitle: "Plans, progress, decisions and results." },
+  ideas: { title: "For you", subtitle: "Helpful suggestions from your connected apps." },
   goals: {
     title: "Goals",
     subtitle: "Longer-term goals and things to keep an eye on.",
   },
   apps: {
-    title: "Apps",
+    title: "Connections",
     subtitle: "Connections, capabilities and what your agent remembers.",
   },
-  connections: { title: "Apps", subtitle: "Connections and capabilities." },
+  connections: { title: "Connections", subtitle: "Connections and capabilities." },
   mail: { title: "Mail", subtitle: "The conversations behind your work." },
   calendar: { title: "Calendar", subtitle: "Time for what matters." },
   browser: { title: "Browser", subtitle: "Your connected browsing sessions." },
@@ -111,9 +122,9 @@ export default function App() {
             <Text
               style={{ fontSize: 32, color: colors.text, letterSpacing: -1, fontWeight: "500" }}
             >
-              Welcome to OpenMuse.
+              Welcome to Mira.
             </Text>
-            <Text style={[s.muted, { textAlign: "center" }]}>A little room for your day.</Text>
+            <Text style={[s.muted, { textAlign: "center" }]}>{APP_TAGLINE}</Text>
             {busy ? (
               <ActivityIndicator color={colors.blueDark} />
             ) : (
@@ -130,7 +141,7 @@ export default function App() {
                   Open workspace
                 </Button>
                 <Text style={[s.small, { marginTop: 15 }]}>
-                  Local workspaces open without a key. Make sure your OpenMuse server is running at{" "}
+                  Local workspaces open without a key. Make sure your Mira server is running at{" "}
                   {API_URL}.
                 </Text>
               </Card>
@@ -261,7 +272,7 @@ function WorkspaceShell({
     data?.tasks.find(
       (task) => task.status === "waiting_approval" || task.status === "waiting_input",
     ) || data?.tasks.find((task) => task.status === "running");
-  const agentName = data?.identity.name || "OpenMuse";
+  const agentName = agentDisplayName(data?.identity.name);
   const status = activeTask
     ? activeTask.status === "waiting_approval"
       ? `Ready to review · ${activeTask.title}`
@@ -270,7 +281,7 @@ function WorkspaceShell({
         : activeTask.plan.find((step) => step.status === "running")?.title || activeTask.title
     : data?.tasks.some((task) => task.status === "queued")
       ? "Picking up your next task…"
-      : "Here when you need me";
+      : "Your personal AI workspace";
   const title = titles[section] || titles.apps;
   const Screen =
     section === "mail"
@@ -375,7 +386,7 @@ function WorkspaceShell({
                     style={{ alignSelf: "flex-start", marginBottom: 18 }}
                     onPress={() => navigate("apps")}
                   >
-                    Back to Apps
+                    Back to Connections
                   </Button>
                 )}
                 <Text style={[s.title, { fontSize: 25, marginBottom: 22 }]}>{title?.title}</Text>

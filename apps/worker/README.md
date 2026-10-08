@@ -1,6 +1,6 @@
-# OpenMuse browser worker
+# Mira browser worker
 
-An independent Node/Playwright service for the OpenMuse server. There is no OpenBot dependency. The server owns app authentication and user ownership; this worker accepts requests only from a trusted server holding `WORKER_TOKEN`.
+An independent Node/Playwright service for the Mira server. There is no OpenBot dependency. The server owns app authentication and user ownership; this worker accepts requests only from a trusted server holding `WORKER_TOKEN`.
 
 ## Run
 

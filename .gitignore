@@ -17,5 +17,7 @@ artifacts/
 !.env.example
 
 .copilotkit
-.openmuse-broken-20260924-140152
 key.txt
+
+.openmuse-broken-20260924-140152
+.openmuse-broken-20261008-123629

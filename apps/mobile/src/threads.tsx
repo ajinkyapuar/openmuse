@@ -132,7 +132,7 @@ export function ThreadsSheet({ onClose }: { onClose: () => void }) {
   }
   return (
     <Sheet
-      title="OpenMuse"
+      title="Mira"
       subtitle={workspace.mode === "sample" ? "Your workspace" : workspace.profile.name}
       onClose={onClose}
     >
@@ -293,7 +293,8 @@ export function ThreadsSheet({ onClose }: { onClose: () => void }) {
               }}
             />
             <Text style={s.muted}>
-              Your conversation is saved in this workspace. You can manage connections in Apps.
+              Your conversation is saved in this workspace. You can manage connections in the
+              Connections section.
             </Text>
           </>
         )}
@@ -309,7 +310,7 @@ export function ThreadsSheet({ onClose }: { onClose: () => void }) {
         />
         <LinkRow
           icon={Monitor}
-          title="Agent computer"
+          title="Mira computer"
           detail="Browser, sessions and documents"
           onPress={() => {
             onClose();
@@ -318,7 +319,7 @@ export function ThreadsSheet({ onClose }: { onClose: () => void }) {
         />
         <LinkRow icon={CalendarDays} title="Calendar" onPress={() => go("calendar")} />
         <LinkRow icon={FileText} title="Files" onPress={() => go("files")} />
-        <LinkRow icon={Settings2} title="Apps & settings" onPress={() => go("apps")} />
+        <LinkRow icon={Settings2} title="Connections & settings" onPress={() => go("apps")} />
         <Button small icon={RefreshCw} onPress={() => void mutate(refresh)}>
           Refresh workspace
         </Button>

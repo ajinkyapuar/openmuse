@@ -2,7 +2,6 @@ import { ArrowUpRight, Check, ChevronRight, type LucideIcon, X } from "lucide-re
 import type { ReactNode } from "react";
 import {
   ActivityIndicator,
-  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -21,14 +20,23 @@ export const colors = {
   text: "#11191C",
   muted: "#697176",
   line: "#EEEEF0",
-  blue: "#C8E7FF",
-  blueDark: "#1473C8",
-  sky: "#EDF7FD",
+  blue: "#E0E2F7",
+  blueDark: "#514FAE",
+  sky: "#EFF0FA",
   green: "#E3F3E8",
   lavender: "#F0EEFA",
   orange: "#FDF0DF",
   danger: "#AA4A45",
 };
+/** Centralized product branding (Mira white-label). */
+export const APP_NAME = "Mira";
+export const APP_TAGLINE = "Personal AI for Learning, Growth & Wellbeing";
+/** Present the Mira brand unless the user chose a distinct (non-legacy) assistant name. */
+export function agentDisplayName(value?: string): string {
+  const name = value?.trim();
+  if (!name || name === "OpenMuse") return APP_NAME;
+  return value ?? name;
+}
 export const s = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center" },
   between: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
@@ -399,7 +407,7 @@ export function LinkRow({
     </Pressable>
   );
 }
-/** OpenMuse's original capybara, shared by every assistant surface. */
+/** Mira brand mark: a soft rounded tile with the "M" wordmark, shared by every assistant surface. */
 export function Mascot({
   size = 42,
   variant = "sky",
@@ -407,30 +415,34 @@ export function Mascot({
   size?: number;
   variant?: "sky" | "sand" | "lilac";
 }) {
-  const palette = {
-    sky: "#ECF5FA",
-    sand: "#FAF0DF",
-    lilac: "#F1ECF9",
+  const tint = {
+    sky: colors.sky,
+    sand: colors.orange,
+    lilac: colors.lavender,
   }[variant];
   return (
-    <View accessibilityLabel="OpenMuse capybara" style={{ width: size, height: size }}>
-      <View
+    <View
+      accessibilityLabel="Mira"
+      style={{
+        width: size,
+        height: size,
+        borderRadius: Math.round(size * 0.32),
+        backgroundColor: tint,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Text
         style={{
-          position: "absolute",
-          top: size * 0.15,
-          left: size * 0.12,
-          width: size * 0.76,
-          height: size * 0.76,
-          borderRadius: size,
-          backgroundColor: palette,
+          fontSize: Math.round(size * 0.52),
+          fontWeight: "700",
+          color: colors.blueDark,
+          letterSpacing: -1,
+          lineHeight: Math.round(size * 0.9),
         }}
-      />
-      <Image
-        source={require("../assets/capybara.png")}
-        resizeMode="contain"
-        style={{ width: size, height: size }}
-        accessible={false}
-      />
+      >
+        M
+      </Text>
     </View>
   );
 }

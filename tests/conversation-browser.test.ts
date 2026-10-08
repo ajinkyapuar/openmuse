@@ -162,8 +162,8 @@ test("chat searches and reads actual owner mail without creating a task or sendi
         : undefined,
   );
   const fixture = await chatFixture(t);
-  await fixture.workspace.ensureSample("local-user", fixture.actions);
-  await fixture.workspace.ensureSample("another-owner", fixture.actions);
+  await fixture.workspace.ensureSample("local-user");
+  await fixture.workspace.ensureSample("another-owner");
   const foreign = (await fixture.workspace.thread("another-owner", "trip-thread"))[0];
   const actionsBefore = await fixture.db.list("local-user", "actions");
   await fixture.db.put("another-owner", "mail", {
@@ -196,7 +196,7 @@ test("chat mail tools report disconnected mail and refuse another owner's thread
   let call = { name: "search_mail", arguments: { query: "aquarium" } as object };
   await modelFixture(t, (index) => (index % 2 === 0 ? call : undefined));
   const fixture = await chatFixture(t);
-  await fixture.workspace.ensureSample("another-owner", fixture.actions);
+  await fixture.workspace.ensureSample("another-owner");
   await fixture.db.put("local-user", "settings", { id: "google", enabled: false });
   async function toolError() {
     const events = (await lastValueFrom(fixture.conversation.run(runInput()).pipe(toArray()))).map(

@@ -156,7 +156,10 @@ test("calendar ranges and complete sample mail threads survive navigation", asyn
   });
   const events = await app.request(`/api/calendar/events?${range}`, { headers: headers() });
   assert.equal(events.status, 200);
-  assert.deepEqual(await events.json(), []);
+  assert.deepEqual(
+    (await events.json()).map((event: { id: string }) => event.id),
+    ["event-math-quiz"],
+  );
   const thread = await app.request("/api/mail/threads/trip-thread", { headers: headers() });
   assert.equal(thread.status, 200);
   assert.equal((await thread.json())[0].id, "mail-fieldtrip");

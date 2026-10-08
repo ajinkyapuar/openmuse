@@ -1,6 +1,6 @@
   <div align="center">
 
-# OpenMuse
+# Mira
 
 **A personal agent with a browser, terminal, files, and work that keeps going. Compatible with any agent harness.**
 
@@ -14,13 +14,13 @@ Built with CopilotKit React Native for iOS, Android, and web.
 
 Clone this template and customize it however you want.
 
-**[Building on OpenMuse? Meet with the CopilotKit team →](https://www.copilotkit.ai/openmuse)**
+**[Building on Mira? Meet with the CopilotKit team →](https://www.copilotkit.ai/openmuse)**
 
-[![OpenMuse 🪁 — Ask it to browse. Watch the 38-second mobile demo.](assets/demos/2026-09-16/mobile.png)](assets/demos/2026-09-16/mobile.mp4)
+[![Mira 🪁 — Ask it to browse. Watch the 38-second mobile demo.](assets/demos/2026-09-16/mobile.png)](assets/demos/2026-09-16/mobile.mp4)
 
 **[Watch the mobile demo · 38 seconds](assets/demos/2026-09-16/mobile.mp4)**
 
-[![OpenMuse 🪁 on the web — Watch the 42-second desktop demo.](assets/demos/2026-09-16/web.png)](assets/demos/2026-09-16/web.mp4)
+[![Mira 🪁 on the web — Watch the 42-second desktop demo.](assets/demos/2026-09-16/web.png)](assets/demos/2026-09-16/web.mp4)
 
 **[Watch the web demo · 42 seconds](assets/demos/2026-09-16/web.mp4)**
 
@@ -30,7 +30,7 @@ Clone this template and customize it however you want.
 
 ## Demo
 
-On iPhone, ask OpenMuse to find interesting stories on Hacker News and summarize CopilotKit. On desktop, ask it to check the school-trip email, open the message, and research exhibits at Monterey Bay Aquarium. The agent shows email and browser results inline. **Take control** opens that same browser session when you need it.
+On iPhone, ask Mira to find interesting stories on Hacker News and summarize CopilotKit. On desktop, ask it to check the school-trip email, open the message, and research exhibits at Monterey Bay Aquarium. The agent shows email and browser results inline. **Take control** opens that same browser session when you need it.
 
 The 38-second iPhone and 42-second desktop web demos show the current interface, framed in 16:9. The send arrow becomes a stop square inside the input pill while the agent replies, then switches back. Stopping keeps your draft intact. See the [recording notes](docs/DEMO.md) for the model setup and reproduction steps.
 
@@ -38,7 +38,7 @@ The 38-second iPhone and 42-second desktop web demos show the current interface,
 
 ## What it is
 
-OpenMuse is a personal-agent application with an agent computer, visible work, and rich results. It runs its own server, task worker, and browser worker. You can inspect and change the source under the MIT license.
+Mira is a personal-agent application with an agent computer, visible work, and rich results. It runs its own server, task worker, and browser worker. You can inspect and change the source under the MIT license.
 
 The computer combines **persistent Chromium and an optional Linux workspace**. The agent can browse public pages, run commands in its own container, work with files, and move PDFs between the computer and the app. You can open its browser or terminal and continue the work. Graphical desktops and autonomous checkout remain future work.
 

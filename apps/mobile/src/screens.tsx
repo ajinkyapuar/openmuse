@@ -1071,7 +1071,7 @@ export function ActivityScreen() {
       </View>
       {actions.length > 0 && (
         <Card>
-          <SectionHeading title="Your actions" />
+          <SectionHeading title="Needs your review" />
           {actions.map((a) => (
             <Pressable
               key={a.id}
@@ -1109,7 +1109,7 @@ export function ActivityScreen() {
                       : colors.canvas
                 }
               >
-                {a.status.replace(/_/g, " ")}
+                {a.status === "awaiting_review" ? "Needs review" : a.status.replace(/_/g, " ")}
               </Chip>
               <ChevronRight size={16} color={colors.muted} />
             </Pressable>
@@ -1118,7 +1118,7 @@ export function ActivityScreen() {
       )}
       {filter === "all" && (
         <Card>
-          <SectionHeading title="Workspace timeline" />
+          <SectionHeading title="Learning timeline" />
           {w.activity.length ? (
             w.activity.map((a, i) => (
               <View
@@ -1223,7 +1223,7 @@ export function ConnectionsScreen({ query = "" }: { query?: string }) {
     },
     {
       id: "browser",
-      name: "Agent computer",
+      name: "Mira computer",
       icon: Globe2,
       color: "#1987CF",
       connected: w.connections.some((c) => c.id === "browser" && c.status === "connected"),
@@ -1249,7 +1249,7 @@ export function ConnectionsScreen({ query = "" }: { query?: string }) {
               {isConnected
                 ? w.mode === "sample"
                   ? "Your connections"
-                  : "Connected"
+                  : "Connected to Mira"
                 : "Available integrations"}
             </Text>
             <View style={{ paddingHorizontal: 16, borderRadius: 23, backgroundColor: "#F3F4F5" }}>
@@ -1368,8 +1368,8 @@ export function ConnectionsScreen({ query = "" }: { query?: string }) {
                 has not been configured.
               </Text>
               <Text style={s.muted}>
-                Your current computer uses OpenMuse’s persistent Chromium worker. OpenBot
-                integration will expand the execution backend while keeping this interface.
+                Your current computer uses Mira’s persistent Chromium worker. OpenBot integration
+                will expand the execution backend while keeping this interface.
               </Text>
             </View>
           )}
